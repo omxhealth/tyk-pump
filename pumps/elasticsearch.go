@@ -22,6 +22,7 @@ type ElasticsearchConf struct {
 	DocumentType       string `mapstructure:"document_type"`
 	RollingIndex       bool   `mapstructure:"rolling_index"`
 	ExtendedStatistics bool   `mapstructure:"extended_stats"`
+	ExcludeAPIKey      bool   `mapstructure:"exclude_api_key"`
 }
 
 func (e *ElasticsearchPump) New() Pump {
@@ -113,19 +114,23 @@ func (e *ElasticsearchPump) WriteData(data []interface{}) error {
 			for dataIndex := range data {
 				var record, _ = data[dataIndex].(analytics.AnalyticsRecord)
 
-				mapping := map[string]interface{}{
+				mapping := map[string]interface{} {
 					"@timestamp":      record.TimeStamp,
 					"http_method":     record.Method,
 					"request_uri":     record.Path,
 					"response_code":   record.ResponseCode,
 					"ip_address":      record.IPAddress,
-					"api_key":         record.APIKey,
 					"api_version":     record.APIVersion,
 					"api_name":        record.APIName,
 					"api_id":          record.APIID,
 					"org_id":          record.OrgID,
+					"alias":           record.Alias,
 					"oauth_id":        record.OauthID,
 					"request_time_ms": record.RequestTime,
+				}
+
+				if !e.esConf.ExcludeAPIKey {
+					mapping["api_key"] = record.APIKey
 				}
 
 				if e.esConf.ExtendedStatistics {

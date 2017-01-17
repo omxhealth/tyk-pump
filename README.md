@@ -142,6 +142,8 @@ Settings are the same as for the original `tyk.conf` for redis and for mongoDB.
 
 `"extended_stats"` - If set to true will include the following additional fields: Raw Request, Raw Response and User Agent.
 
+`"exclude_api_key"` - If set to true will exclude the api_key field.
+
 ## Compiling & Testing
 
 1. Download dependent packages:
